@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070A0D">
+<meta name="robots" content="noindex, nofollow">
+<title>Tibr Admin</title>
+<link rel="icon" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--canvas:#070A0D;--surface:#0B1015;--surface2:#10171E;--line:rgba(255,255,255,.07);--brand:#F59E0B;--brandl:#FBBF24;--pos:#34D399;--neg:#F87171;--ink:#F5F5F5;--ink2:rgba(255,255,255,.6);--ink3:rgba(255,255,255,.35)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--canvas);color-scheme:dark;-webkit-text-size-adjust:100%}
+body{font-family:'IBM Plex Sans Arabic',system-ui,'Segoe UI',Tahoma,sans-serif;background:var(--canvas);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased;line-height:1.5;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brandl);outline-offset:2px}
+.num{direction:ltr;unicode-bidi:isolate}
+.wrap{max-width:640px;margin-inline:auto;padding:20px 16px 48px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:34px;height:34px}
+.brand b{display:block;font-size:16px;font-weight:600}
+.brand small{display:block;font-size:11px;color:var(--ink2)}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);color:var(--ink2);background:none}
+.iconbtn:hover{background:rgba(255,255,255,.05);color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card+.card{margin-top:14px}
+h1{font-size:20px;font-weight:600;letter-spacing:-.01em}
+h2{font-size:15px;font-weight:600;margin-bottom:12px}
+p.mut{font-size:13px;color:var(--ink2);line-height:1.6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px}
+.field input{width:100%;height:46px;border:1px solid var(--line);background:var(--surface2);border-radius:11px;padding-inline:14px;font-size:16px;transition:border-color .15s}
+.field input:hover{border-color:rgba(255,255,255,.18)}
+.field input:focus{outline:none;border-color:rgba(245,158,11,.55)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;border-radius:11px;font-size:14px;font-weight:600;border:0;background:var(--brand);color:var(--canvas);transition:background .15s}
+.btn:hover{background:var(--brandl)}
+.btn:disabled{opacity:.55;pointer-events:none}
+.btn.sec{background:var(--surface2);color:var(--ink);border:1px solid var(--line);font-weight:500}
+.btn.sec:hover{background:rgba(255,255,255,.06)}
+.btn.danger{background:transparent;color:var(--neg);border:1px solid rgba(248,113,113,.35);font-weight:500}
+.btn.danger:hover{background:rgba(248,113,113,.08)}
+.btn.w-auto{width:auto;padding-inline:16px}
+.row{display:flex;gap:8px}
+.msg{font-size:13px;border-radius:10px;padding:10px 12px;margin-bottom:14px;display:none}
+.msg.err{display:block;background:rgba(248,113,113,.1);color:#fca5a5;border:1px solid rgba(248,113,113,.25)}
+.msg.ok{display:block;background:rgba(52,211,153,.1);color:#6ee7b7;border:1px solid rgba(52,211,153,.25)}
+.client{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.client .name{font-weight:600;font-size:15px}
+.client .proj{font-size:13px;color:var(--ink2);margin-top:2px}
+.client .link{margin-top:10px;font-size:12px;color:var(--ink2);word-break:break-all;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Menlo,monospace}
+.client .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.client .acts .btn{width:auto;padding-inline:12px;min-height:38px;font-size:13px}
+.empty{text-align:center;padding:32px 12px;color:var(--ink2);font-size:14px}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-inline-start-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:14px}
+.check input{width:18px;height:18px}
+[dir=rtl] .field input{text-align:right}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const ICONS={lock:'<path d="M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2Z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+open:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>',
+trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+check:'<path d="M20 6 9 17l-5-5"/>',refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>'};
+const ic=n=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+const MARK=`<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#10171E" stroke="rgba(255,255,255,0.07)"/><path d="M9 21.5 11.5 11.5h9L23 21.5Z" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linejoin="round"/><path d="M12.6 16.5h6.8" stroke="#FBBF24" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isAr=(navigator.language||'').toLowerCase().startsWith('ar');
+let LANG=localStorage.getItem('tibr.admin.lang')||(isAr?'ar':'en');
+const L={
+en:{title:'Admin',tag:'Client links',login:'Sign in',pw:'Password',pwPh:'Enter admin password',signin:'Sign in',wrong:'Wrong password.',locked:'Too many attempts. Try again in a few minutes.',neterr:'Could not reach the server. Check your connection.',notconf:'Admin access is not configured for this site yet.',
+clients:'Clients',add:'Add client',refresh:'Refresh',logout:'Sign out',
+nameEn:'Name (English)',nameAr:'Name (Arabic)',projEn:'Project (English)',projAr:'Project (Arabic)',url:'OneDrive file link (data source)',viewUrl:'Open-Excel link (optional)',showBtn:'Show "Open Excel" button using the same link above',
+create:'Create link',creating:'Creating…',empty:'No clients yet. Add the first one above.',copy:'Copy link',copied:'Copied',open:'Open',revoke:'Revoke',revoking:'Revoking…',confirmRevoke:"Revoke this client's link? It will stop working immediately.",
+required:'Please fill in all name and project fields.',badUrl:'The link must start with https://',created:'Client added. Link copied to clipboard.',revoked:'Link revoked.',loadErr:'Could not load clients.'},
+ar:{title:'الإدارة',tag:'روابط العملاء',login:'تسجيل الدخول',pw:'كلمة المرور',pwPh:'أدخل كلمة مرور الإدارة',signin:'دخول',wrong:'كلمة المرور غير صحيحة.',locked:'محاولات كثيرة. حاول بعد بضع دقائق.',neterr:'تعذّر الوصول للخادم. تحقق من الاتصال.',notconf:'صلاحية الإدارة غير مُفعّلة بعد لهذا الموقع.',
+clients:'العملاء',add:'إضافة عميل',refresh:'تحديث',logout:'تسجيل الخروج',
+nameEn:'الاسم (إنجليزي)',nameAr:'الاسم (عربي)',projEn:'المشروع (إنجليزي)',projAr:'المشروع (عربي)',url:'رابط ملف OneDrive (مصدر البيانات)',viewUrl:'رابط فتح Excel (اختياري)',showBtn:'إظهار زر «فتح Excel» بنفس الرابط أعلاه',
+create:'إنشاء الرابط',creating:'جارٍ الإنشاء…',empty:'لا يوجد عملاء بعد. أضف أول عميل أعلاه.',copy:'نسخ الرابط',copied:'تم النسخ',open:'فتح',revoke:'إلغاء',revoking:'جارٍ الإلغاء…',confirmRevoke:'إلغاء رابط هذا العميل؟ سيتوقف عن العمل فوراً.',
+required:'يرجى تعبئة كل حقول الاسم والمشروع.',badUrl:'يجب أن يبدأ الرابط بـ https://',created:'تمت إضافة العميل. نُسخ الرابط.',revoked:'تم إلغاء الرابط.',loadErr:'تعذّر تحميل قائمة العملاء.'}
+};
+const t=k=>L[LANG][k]??k;
+const api=(p,opt)=>fetch(p,{credentials:'same-origin',headers:{'content-type':'application/json'},...opt});
+let clients=[];
+
+function shell(inner){
+  document.documentElement.lang=LANG; document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
+  $('#app').innerHTML=`<div class="top"><span class="brand">${MARK}<span><b>${t('title')}</b><small>${t('tag')}</small></span></span>
+    <button class="iconbtn" id="langBtn" aria-label="lang">${LANG==='ar'?'EN':'AR'}</button></div>${inner}`;
+  $('#langBtn').onclick=()=>{LANG=LANG==='ar'?'en':'ar';localStorage.setItem('tibr.admin.lang',LANG);render()};
+}
+
+function loginView(msg){
+  shell(`<div class="card"><h2>${t('login')}</h2>
+    <div class="msg ${msg?'err':''}">${msg?esc(msg):''}</div>
+    <form id="loginForm"><div class="field"><label for="pw">${t('pw')}</label><input id="pw" type="password" placeholder="${t('pwPh')}" autocomplete="current-password" required></div>
+    <button class="btn" id="loginBtn" type="submit">${t('signin')}</button></form></div>`);
+  $('#loginForm').onsubmit=async e=>{
+    e.preventDefault();
+    const btn=$('#loginBtn'); btn.disabled=true; btn.innerHTML=`<span class="spin"></span>`;
+    try{
+      const r=await api('/api/admin/login',{method:'POST',body:JSON.stringify({password:$('#pw').value})});
+      if(r.ok){await loadAndShow();return}
+      if(r.status===429)return loginView(t('locked'));
+      if(r.status===500)return loginView(t('notconf'));
+      loginView(t('wrong'));
+    }catch(_){loginView(t('neterr'))}
+  };
+}
+
+function fmtName(c){return LANG==='ar'?(c.nameAr||c.nameEn):(c.nameEn||c.nameAr)}
+function fmtProj(c){return LANG==='ar'?(c.projectAr||c.projectEn):(c.projectEn||c.projectAr)}
+
+function clientRow(c){
+  const link=location.origin+'/c/'+c.token;
+  return `<div class="client" data-token="${esc(c.token)}">
+    <div class="name">${esc(fmtName(c))}</div><div class="proj">${esc(fmtProj(c))}</div>
+    <div class="link">${esc(link)}</div>
+    <div class="acts">
+      <button class="btn sec" data-a="copy" data-link="${esc(link)}">${ic('copy')}${t('copy')}</button>
+      <a class="btn sec w-auto" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${ic('open')}${t('open')}</a>
+      <button class="btn danger w-auto" data-a="revoke" data-token="${esc(c.token)}">${ic('trash')}${t('revoke')}</button>
+    </div></div>`;
+}
+async function loadAndShow(){
+  shell(`<div class="card"><h2>${t('add')}</h2><div class="msg" id="addMsg"></div>
+    <form id="addForm">
+      <div class="two"><div class="field"><label>${t('nameEn')}</label><input name="nameEn" required></div><div class="field"><label>${t('nameAr')}</label><input name="nameAr" dir="rtl" required></div></div>
+      <div class="two"><div class="field"><label>${t('projEn')}</label><input name="projectEn" required></div><div class="field"><label>${t('projAr')}</label><input name="projectAr" dir="rtl" required></div></div>
+      <div class="field"><label>${t('url')}</label><input name="url" type="url" placeholder="https://1drv.ms/x/..." required></div>
+      <label class="check"><input type="checkbox" id="showExcel"> ${t('showBtn')}</label>
+      <div class="field hidden" id="viewUrlField"><label>${t('viewUrl')}</label><input name="viewUrl" type="url" placeholder="https://..."></div>
+      <button class="btn" id="addBtn" type="submit">${ic('plus')}${t('create')}</button>
+    </form></div>
+    <div class="card"><div class="row" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0">${t('clients')} <span id="count" style="color:var(--ink3);font-weight:400"></span></h2>
+      <button class="iconbtn" id="refreshBtn" aria-label="${t('refresh')}">${ic('refresh')}</button></div>
+      <div id="list"></div></div>
+    <button class="btn sec" id="logoutBtn" style="margin-top:4px">${t('logout')}</button>`);
+
+  $('#showExcel').onchange=e=>$('#viewUrlField').classList.toggle('hidden',!e.target.checked);
+  $('#logoutBtn').onclick=async()=>{await api('/api/admin/logout',{method:'POST'});loginView()};
+  $('#refreshBtn').onclick=()=>fetchClients();
+  $('#addForm').onsubmit=onAdd;
+  $('#list').onclick=onListClick;
+
+  await fetchClients();
+}
+
+async function fetchClients(){
+  const list=$('#list'); if(!list)return;
+  list.innerHTML=`<p class="empty"><span class="spin"></span></p>`;
+  try{
+    const r=await api('/api/admin/clients');
+    if(r.status===401)return loginView();
+    if(!r.ok)throw 0;
+    const data=await r.json();
+    clients=data.items||[];
+    $('#count').textContent=clients.length?`(${clients.length})`:'';
+    list.innerHTML=clients.length?clients.map(clientRow).join(''):`<p class="empty">${t('empty')}</p>`;
+  }catch(_){ list.innerHTML=`<p class="empty">${t('loadErr')}</p>`; }
+}
+
+async function onAdd(e){
+  e.preventDefault();
+  const form=e.target, btn=$('#addBtn'), msg=$('#addMsg');
+  msg.className='msg';
+  const fd=new FormData(form);
+  const body={nameEn:fd.get('nameEn').trim(),nameAr:fd.get('nameAr').trim(),projectEn:fd.get('projectEn').trim(),projectAr:fd.get('projectAr').trim(),url:fd.get('url').trim()};
+  if($('#showExcel').checked){const v=(fd.get('viewUrl')||'').trim(); body.viewUrl=v||body.url}
+  if(!body.nameEn||!body.nameAr||!body.projectEn||!body.projectAr){msg.className='msg err';msg.textContent=t('required');return}
+  if(!/^https:\/\//.test(body.url)){msg.className='msg err';msg.textContent=t('badUrl');return}
+  btn.disabled=true; const old=btn.innerHTML; btn.innerHTML=`<span class="spin"></span>${t('creating')}`;
+  try{
+    const r=await api('/api/admin/clients',{method:'POST',body:JSON.stringify(body)});
+    if(r.status===401)return loginView();
+    if(!r.ok){const j=await r.json().catch(()=>({}));msg.className='msg err';msg.textContent=j.message||t('required');return}
+    const {token}=await r.json();
+    const link=location.origin+'/c/'+token;
+    try{await navigator.clipboard.writeText(link)}catch(_){}
+    msg.className='msg ok'; msg.textContent=t('created')+' '+link;
+    form.reset(); $('#viewUrlField').classList.add('hidden');
+    await fetchClients();
+  }catch(_){msg.className='msg err';msg.textContent=t('neterr')}
+  finally{btn.disabled=false; btn.innerHTML=old}
+}
+
+async function onListClick(e){
+  const copyBtn=e.target.closest('[data-a=copy]');
+  if(copyBtn){
+    try{await navigator.clipboard.writeText(copyBtn.dataset.link)}catch(_){}
+    const orig=copyBtn.innerHTML; copyBtn.innerHTML=ic('check')+t('copied');
+    setTimeout(()=>copyBtn.innerHTML=orig,1400);
+    return;
+  }
+  const revokeBtn=e.target.closest('[data-a=revoke]');
+  if(revokeBtn){
+    if(!confirm(t('confirmRevoke')))return;
+    const token=revokeBtn.dataset.token; revokeBtn.disabled=true; revokeBtn.innerHTML=`<span class="spin"></span>${t('revoking')}`;
+    try{
+      const r=await api('/api/admin/clients/'+encodeURIComponent(token),{method:'DELETE'});
+      if(r.status===401)return loginView();
+      await fetchClients();
+    }catch(_){revokeBtn.disabled=false}
+  }
+}
+
+async function render(){
+  try{
+    const r=await api('/api/admin/me');
+    if(r.ok) return loadAndShow();
+  }catch(_){}
+  loginView();
+}
+render();
+</script>
+</body>
+</html>
